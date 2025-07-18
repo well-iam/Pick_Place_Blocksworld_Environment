@@ -30,8 +30,10 @@ add_library(pose_relay_plugin SHARED
 )
 
 # include generated messages
-#rosidl_target_interfaces(pose_relay_plugin
-#  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
+target_link_libraries(pose_relay_plugin ${cpp_typesupport_target})
+
 
 ament_target_dependencies(pose_relay_plugin
   rclcpp
@@ -39,13 +41,6 @@ ament_target_dependencies(pose_relay_plugin
   geometry_msgs
   ignition-gazebo6
   ignition-transport11
-)
-
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
-
-target_link_libraries(pose_relay_plugin
-  ${cpp_typesupport_target}
 )
 
 # install the plugin

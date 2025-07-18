@@ -1,8 +1,8 @@
 shoulder_pan_joint: 0.0
-shoulder_lift_joint: -1.57
-elbow_joint: 0.0
+shoulder_lift_joint: -1.5708
+elbow_joint: 1.5708
 wrist_1_joint: -1.57
-wrist_2_joint: 0.0
+wrist_2_joint: -1.5708
 wrist_3_joint: 0.0
-robotiq_85_left_knuckle_joint: 0
-
+# Added to fake Hand Control
+flange-tool0: 0.0

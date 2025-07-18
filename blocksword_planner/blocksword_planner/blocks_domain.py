@@ -1,5 +1,4 @@
 from __future__ import print_function
-#import hddl_pyhop as pyhop
 from . import pyhop
 import rclpy
 from my_sim_plugins.msg import BlockPoseArray
@@ -11,7 +10,8 @@ from my_sim_plugins.msg import BlockPoseArray
 
 # Initializing the PyHOP domain
 
-#-- helping functions to implement methods e operators. 
+
+#-- helping functions to implement methods and operators
 
 def is_done(b1,state,goal):
     if b1 == 'table': return True
@@ -58,8 +58,8 @@ def unstack(state,b,c):
         return state
     else: return False
     
-def putdown(state,b):
-    if state.pos[b] == 'hand': #PRECONDITION: Block in HAND 
+def putdown(state,b): #PRECONDITION: Block in HAND 
+    if state.pos[b] == 'hand':
         state.pos[b] = 'table'
         state.clear[b] = True
         state.holding = False
@@ -98,7 +98,7 @@ def moveb_m(state,goal):
             return [('move_one',b1,goal.pos[b1]), ('move_blocks',goal)]
         else:
             continue
-    
+    #
     # If we get here, no blocks can be moved to their final locations.
     # If there's one needs to be moved and can be moved to the table, do so.
     b1 = pyhop.find_if(
@@ -162,11 +162,10 @@ class DynamicBlocksworld:
         self.state = None
         self.goal  = None
 
-
-        # Subscription to bridged topic by plugin
+       # Subscription to bridged topic by plugin
         self.sub = node.create_subscription(
-            BlockPoseArray, 
-            topic, 
+            BlockPoseArray, #Tipo msg
+            topic,  #Nome topic
             self._callback,
             100
         )
@@ -175,13 +174,11 @@ class DynamicBlocksworld:
         # 1) Pose Extraction of models "block_..." 
         # The goal is to build a symbolic dictionary for the planner based on the pose retrieved from gazebo topic
         #pos = {} #Block Name -> Key,  Content-> Block Underneath
-        #Block Size is 0.07x0.07x0.07m
+        #Block Size is 0.1x0.1x0.1m
         #If z is 'low', then its placed on the table. Otherwise it is place on another block
-        #An offset of 0.018 (half of half block size) is used to determine threshold
-
-
+        #An offset of 0.025 (half of half block size) is used to determine threshold
     def _callback(self, msg: BlockPoseArray):
-        if not self.received: #Callback is executed once, at the end of the callback this field is set to true
+        if not self.received: #Callback is executed once
 
             pos = {}  
 
@@ -192,7 +189,7 @@ class DynamicBlocksworld:
                 if not name.startswith("block_"):
                     continue
 
-                if pose.position.z < 0.053:
+                if pose.position.z < 0.075:
                     pos[name] = 'table'
                 else:
                     under = 'table'
@@ -202,18 +199,17 @@ class DynamicBlocksworld:
                         dz = pose.position.z - other.pose.position.z
                         dx = abs(pose.position.x - other.pose.position.x)
                         dy = abs(pose.position.y - other.pose.position.y)
-                        if (dz < 0.088 and dz > 0) and dx < 0.018 and dy < 0.018:
+                        if (dz < 0.125 and dz > 0) and dx < 0.025 and dy < 0.025:
                             under = other.name
                             break
                     pos[name] = under
 
 
-            
             # 2) Computes clear state dictionary: 
             #clear = {} #Block Name -> Key,  Content -> Boolean (True if Block is Clear, False otherwise)
             clear = {b: all(pos.get(o) != b for o in pos) for b in pos}
 
-            # 3) Build corresponding symbolig Pyhop state
+           # 3) Build corresponding symbolig Pyhop state
             state1 = pyhop.State('state1')
             state1.pos     = pos
             state1.clear   = clear
@@ -228,8 +224,9 @@ class DynamicBlocksworld:
             goal.holding=False
             
             self.state, self.goal = state1, goal
-             # Flag to set in order to execute this callback only once
-            self.received = True 
+            # Flag to set in order to execute this callback only once
+            self.received = True
+            
 
     def get_state_and_goal(self, timeout_sec=1.0):
         start = self.node.get_clock().now().nanoseconds / 1e9
@@ -249,6 +246,7 @@ def run_pyhop_plan(state, goal):
     pyhop.declare_methods('get', get_m)
     pyhop.declare_methods('put', put_m)
     pyhop.declare_operators(pickup, unstack, putdown, stack)
-    # call planner
-    result = pyhop.pyhop(state, [('move_blocks', goal)], verbose=0)
-    return result  #could be False or (plan, state_trace)
+
+    # plan
+    plan = pyhop.pyhop(state, [('move_blocks', goal)], verbose=0)
+    return plan

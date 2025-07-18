@@ -155,10 +155,9 @@ def find_if(cond,seq):
 ############################################################
 # Commands to tell Pyhop what the operators and methods are
 
-#Le azioni, con i suoi effetti, modificano gli stati. Essendo implementati come oggetti, vuol dire modificare proprio i campi della classe stato.
-operators = {} #Primitive
+#Primitives, and their effect, modify the states. Each state is implemented as object of a class, so changing the state means modifying the fields of the State class.
+operators = {} #Primitives
 methods = {}
-#Per capire come definirle, apri l'altro file
 
 def declare_operators(*op_list):
     """
@@ -199,58 +198,44 @@ def pyhop(state,tasks,verbose=0): #Calls the seek_plan function that solves the 
     If successful, return the plan. Otherwise return False.
     """
     if verbose>0: print('** pyhop, verbose={}: **\n   state = {}\n   tasks = {}'.format(verbose, state.__name__, tasks))
-    result = seek_plan(state, tasks, plan=None, state_trace=None, depth=0, verbose=verbose) 
+    result = seek_plan(state,tasks,[],0,verbose) 
     if verbose>0: print('** result =',result,'\n')
     return result
 
-def seek_plan(state, tasks, plan=None, state_trace=None, depth=0, verbose=0):
+def seek_plan(state,tasks,plan,depth,verbose=0):  #Algorithm implementation
     """
-    - state: stato corrente
-    - tasks: lista di task ancora da risolvere
-    - plan: lista di azioni applicate fino ad ora
-    - state_trace: lista di stati intermedi (includerà sempre l’iniziale e ogni newstate)
-    - depth, verbose: come prima
+    Workhorse for pyhop. state and tasks are as in pyhop.
+    - plan is the current partial plan.
+    - depth is the recursion depth, for use in debugging
+    - verbose is whether to print debugging messages
     """
-    if plan        is None: plan = []
-    if state_trace is None: state_trace = [copy.deepcopy(state)]
-
-    if verbose>1:
-        print(f'depth {depth} tasks {tasks}')
+    if verbose>1: print('depth {} tasks {}'.format(depth,tasks))
     if tasks == []:
-        #Once Tasks are all resolved, returns plan and sequence of states
-        return plan, state_trace
-
+        if verbose>2: print('depth {} returns plan {}'.format(depth,plan))
+        return plan
     task1 = tasks[0]
     if task1[0] in operators: #Check if task is a primitive
-        if verbose>2: print(f'depth {depth} action {task1}')
-        op = operators[task1[0]]
-        newstate = op(copy.deepcopy(state), *task1[1:]) #Application of the operator in the current generates the new state.
+        if verbose>2: print('depth {} action {}'.format(depth,task1))
+        operator = operators[task1[0]]
+        newstate = operator(copy.deepcopy(state),*task1[1:]) #Application of the operator in the current generates the new state.
         if verbose>2:
-            print(f'depth {depth} new state:')
+            print('depth {} new state:'.format(depth))
             print_state(newstate)
-        if newstate: #If newstate is not empty the operator has been successful applied
-            sol = seek_plan(newstate,tasks[1:],plan + [task1],state_trace + [newstate],depth + 1,verbose)
-            if sol:
-                return sol
-    if task1[0] in methods:
-        if verbose>2: print(f'depth {depth} method {task1}')
-        for method in methods[task1[0]]: #List for all existing methods
-            subtasks = method(state, *task1[1:])
-            if subtasks is False:
-                continue
-            if verbose>2: print(f'depth {depth} new tasks: {subtasks}')
-            sol = seek_plan(
-                state,
-                subtasks + tasks[1:],
-                plan,
-                state_trace,
-                depth + 1,
-                verbose
-            )
-            if sol:
-                return sol
-
-    if verbose>2:
-        print(f'depth {depth} returns failure')
+        if newstate:  #If newstate is not empty the operator has been successful applied
+            solution = seek_plan(newstate,tasks[1:],plan+[task1],depth+1,verbose)
+            if solution != False:
+                return solution
+    if task1[0] in methods: #Se il task è un metodo
+        if verbose>2: print('depth {} method instance {}'.format(depth,task1))
+        relevant = methods[task1[0]] #List for all existing methods
+        for method in relevant:
+            subtasks = method(state,*task1[1:])
+            # Can't just say "if subtasks:", because that's wrong if subtasks == []
+            if verbose>2:
+                print('depth {} new tasks: {}'.format(depth,subtasks))
+            if subtasks != False:
+                solution = seek_plan(state,subtasks+tasks[1:],plan,depth+1,verbose)
+                if solution != False:
+                    return solution
+    if verbose>2: print('depth {} returns failure'.format(depth))
     return False
-

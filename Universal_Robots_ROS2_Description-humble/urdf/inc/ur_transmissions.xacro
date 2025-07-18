@@ -69,7 +69,7 @@
     </transmission>
 
     <!-- Trasmission for fake hand -->
-    <!-- <transmission name="${prefix}flange-tool0_trans">
+    <transmission name="${prefix}flange-tool0_trans">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${prefix}flange-tool0">
         <hardwareInterface>${hw_interface}</hardwareInterface>
@@ -77,7 +77,7 @@
       <actuator name="${prefix}flange-tool0_motor">
         <mechanicalReduction>1</mechanicalReduction>
       </actuator>
-    </transmission> -->
+    </transmission>
 
   </xacro:macro>
 

@@ -2,15 +2,9 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur">
    <!-- robot name parameter -->
    <xacro:arg name="name" default="ur"/>
-   <xacro:arg name="gripper" default="true"/>
    <!-- import main macro -->
-   <xacro:if value="$(arg gripper)">
-      <xacro:include filename="$(find ur_description)/urdf/ur_macro_w_gripper.xacro"/>
-   </xacro:if>
+   <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
 
-   <xacro:unless value="$(arg gripper)">
-      <xacro:include filename="$(find ur_description)/urdf/ur_macro.xacro"/>
-   </xacro:unless>
    <!-- possible 'ur_type' values: ur3, ur3e, ur5, ur5e, ur7e, ur10, ur10e, ur12e, ur16e, ur15, ur20, ur30 -->
    <!-- the default value should raise an error in case this was called without defining the type -->
    <xacro:arg name="ur_type" default="ur5e"/>

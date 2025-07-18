@@ -455,19 +455,12 @@
     <joint name="${tf_prefix}wrist_3-flange" type="fixed">
       <parent link="${tf_prefix}wrist_3_link" />
       <child link="${tf_prefix}flange" />
-      <origin xyz="0 0 0" rpy="0 ${-pi/2.0} ${-pi/2.0}" />
+      <origin xyz="0 0 0.00" rpy="0 ${-pi/2.0} ${-pi/2.0}" />
     </joint>
 
-    <!-- ROS-Industrial 'tool0' frame - all-zeros tool frame -->
-    <!-- <link name="${tf_prefix}tool0"/>
-    <joint name="${tf_prefix}flange-tool0" type="fixed">
-      
-      <origin xyz="0 0 0" rpy="${pi/2.0} 0 ${pi/2.0}"/>
-      <parent link="${tf_prefix}flange"/>
-      <child link="${tf_prefix}tool0"/>
-    </joint> -->
 
-    <!-- FAKE TOOL0 LINK (VISIBLE GREEN CUBE) -->
+    <!-- FAKE TOOL0 LINK (It Represents a Fake Attached End-Effector) -->
+
     <link name="${tf_prefix}tool0">
       <visual>
         <origin xyz="0 0 0.0" rpy="0 0 0"/>
@@ -478,25 +471,19 @@
           <color rgba="0 1.0 0 1.0"/> <!-- Opaque green -->
         </material>
       </visual>
-      <collision>
-        <origin xyz="0 0 0.0" rpy="0 0 0"/>
-        <geometry>
-          <box size="0.02 0.02 0.02"/>
-        </geometry>
-      </collision>
-      <inertial>
-        <mass value="0.01"/>
+     <inertial>
+        <mass value="1e-6"/>
         <origin xyz="0 0 0.0" rpy="0 0 0"/>
         <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
       </inertial>
     </link>
 
-    <!-- FIXED JOINT FROM wrist_3_link TO tool0 -->
+    <!-- REVOLUTE FAKE JOINT from flange TO tool0 (Cannot be Fixed beacuse it needs to be 'controlled' by MoveIt) -->
     <joint name="${tf_prefix}flange-tool0" type="revolute">
       <parent link="${tf_prefix}wrist_3_link"/>
       <child link="${tf_prefix}tool0"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <limit lower="-0.0001" upper="0.0001"
+      <origin xyz="0 0 0.07" rpy="0 0 0"/>
+      <limit lower="-0.00000000000000001" upper="0.0000000000000000001"
              effort="0.001" velocity="0.001"/>
     </joint>
 

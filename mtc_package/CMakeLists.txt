@@ -15,7 +15,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(ros_gz_interfaces REQUIRED)
 
 
-add_executable(mtc_node src/mtc_node.cpp)
+add_executable(mtc_node src/mtc_node.cpp src/BlockFollower.cpp)
 
 target_include_directories(mtc_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -31,22 +31,7 @@ ament_target_dependencies(
   ros_gz_interfaces
 )
 
-add_executable(manager src/manager.cpp)
-
-target_include_directories(manager PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(manager PUBLIC c_std_99 cxx_std_17)
-ament_target_dependencies(
-  manager
-  rclcpp
-  std_srvs
-  my_sim_plugins
-  std_msgs
-)
-
-
-install(TARGETS mtc_node manager
+install(TARGETS mtc_node
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}

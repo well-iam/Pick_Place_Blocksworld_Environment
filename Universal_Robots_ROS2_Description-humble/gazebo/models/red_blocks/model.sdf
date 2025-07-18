@@ -3,15 +3,13 @@
   <model name="blocks">
     <static>false</static>
     <link name="link">
-
-
-<!-- Inertial properties (realistic but not too light) -->
+      <!-- Inertial properties (optional but recommended) -->
       <inertial>
-        <mass>0.1</mass>  
+        <mass>0.5</mass>
         <inertia>
-          <ixx>0.0005</ixx>
-          <iyy>0.0005</iyy>
-          <izz>0.0005</izz>
+          <ixx>0.000333</ixx>
+          <iyy>0.000333</iyy>
+          <izz>0.000333</izz>
           <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
         </inertia>
       </inertial>
@@ -19,36 +17,31 @@
       <collision name="collision">
         <geometry>
           <box>
-            <size>0.07 0.07 0.07</size>
+            <size>0.1 0.1 0.1</size>
           </box>
         </geometry>
 
+        <!-- HIGH FRICTION / ZERO BOUNCE -->
         <surface>
-          <!-- Estremo attrito per farlo restare nel gripper -->
-        <friction>
-          <ode>
-            <mu>0.008</mu>
-            <mu2>0.008</mu2>
-            <fdir1>1 0 0</fdir1>
-            <slip1>0.0</slip1>
-            <slip2>0.0</slip2>
-          </ode>
-        </friction>
-
-        <!-- Niente rimbalzo -->
-        <bounce>
-          <restitution_coefficient>0.0</restitution_coefficient>
-          <threshold>0.0</threshold>
-        </bounce>
-
-          <!-- Contatti soft per assorbire energia -->
+          <friction>
+            <ode>
+              <!-- High mu to resist sliding when placing -->
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+          <bounce>
+            <!-- No restitution so it won’t bounce -->
+            <restitution_coefficient>0.0</restitution_coefficient>
+            <threshold>100.0</threshold>
+          </bounce>
+          <!-- Optional: soft contact to damp vibration -->
           <contact>
             <ode>
-              <kp>1e6</kp>        <!-- contact stiffness -->
-              <kd>1e4</kd>        <!-- contact damping -->
-              <soft_cfm>1e-6</soft_cfm>  <!-- Leggermente più morbido -->
-              <max_vel>0.01</max_vel>      <!-- AGGIUNGI questo -->
-              <min_depth>0.001</min_depth>  <!-- AGGIUNGI questo -->
+              <kp>1e5</kp>        <!-- contact stiffness -->
+              <kd>1e3</kd>        <!-- contact damping -->
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
             </ode>
           </contact>
         </surface>
@@ -57,7 +50,7 @@
       <visual name="visual">
         <geometry>
           <box>
-            <size>0.07 0.07 0.07</size>
+            <size>0.1 0.1 0.1</size>
           </box>
         </geometry>
 

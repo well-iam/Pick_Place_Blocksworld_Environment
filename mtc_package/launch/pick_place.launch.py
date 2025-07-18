@@ -8,7 +8,7 @@ def generate_launch_description():
 
     #Non so se cambia tra questa e quella a riga 7
     moveit_config = (
-        MoveItConfigsBuilder("custom_robot", package_name="ur5_gripper_moveit_config")
+        MoveItConfigsBuilder("custom_robot", package_name="ur5_new_moveit_config")
         .robot_description(file_path="config/ur.urdf.xacro", mappings={"name": "ur"})
         .robot_description_semantic(file_path="config/ur.srdf")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
@@ -17,7 +17,7 @@ def generate_launch_description():
             publish_robot_description= True, publish_robot_description_semantic=True, publish_planning_scene=True
         )
         .planning_pipelines(
-            pipelines=["ompl", "pilz_industrial_motion_planner"]
+            pipelines=["ompl", "chomp", "pilz_industrial_motion_planner"]
         )
         .to_moveit_configs()
     ) 
@@ -100,7 +100,15 @@ def generate_launch_description():
         }
     }
 
-
+    set_entity_pose_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='set_pose_bridge',
+        output='screen',
+        arguments=[
+            '/world/blocksworld/set_pose@ros_gz_interfaces/srv/SetEntityPose'
+            ]
+        )
 
     # MTC Demo node
     pick_place_demo = Node(
@@ -113,4 +121,7 @@ def generate_launch_description():
         ],
     )
 
-    return LaunchDescription([pick_place_demo])
+    return LaunchDescription([
+        set_entity_pose_bridge,
+        pick_place_demo
+        ])

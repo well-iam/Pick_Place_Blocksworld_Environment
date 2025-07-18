@@ -4,7 +4,7 @@
 #include <ignition/plugin/Register.hh> 
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <ignition/msgs/pose_v.pb.h>
-#include "my_sim_plugins/msg/block_pose_array.hpp" //Include self-made msg
+#include "my_sim_plugins/msg/block_pose_array.hpp" //Self-Made msg Inclusion
 #include <memory>
 #include <iostream>
 #include <thread>
@@ -36,7 +36,7 @@ namespace my_sim_plugins
       ign_node_.Subscribe("/world/blocksworld/pose/info", &PoseRelayPlugin::OnPoseMsg, this);
       // Create a ROS timer to republish at 10 Hz
       timer_ = rclcpp_node_->create_wall_timer(
-        std::chrono::milliseconds(100),
+        std::chrono::milliseconds(10),
         std::bind(&PoseRelayPlugin::PublishLatest, this)
       );
     }

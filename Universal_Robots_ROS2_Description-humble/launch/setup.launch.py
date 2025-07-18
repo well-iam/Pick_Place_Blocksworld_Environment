@@ -21,26 +21,21 @@ def generate_launch_description():
     joint_controllers_file = os.path.join(
         get_package_share_directory('ur_simulation_gazebo'), 'config', 'ur_controllers.yaml'
     )
-     
+
     gazebo_world= DeclareLaunchArgument(
         'gazebo_world',
         default_value='blocksworld.world',
         description='Configuration of robot with camera',
     )
+    
 
     world_file = PathJoinSubstitution(
         [FindPackageShare('ur_description'),
             'gazebo/worlds', LaunchConfiguration('gazebo_world')]
     )
-
-    rviz_config_path = (
-    get_package_share_directory("ur5_gripper_moveit_config") + "/config/moveit.rviz"
-    )
-
-
-    #import pprint                                                             
+                                                                    
     moveit_config = (
-        MoveItConfigsBuilder("ur5_gripper", package_name="ur5_gripper_moveit_config")
+        MoveItConfigsBuilder("custom_robot", package_name="ur5_new_moveit_config")
         .robot_description(file_path="config/ur.urdf.xacro", mappings={"name": "ur"})
         .robot_description_semantic(file_path="config/ur.srdf")
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
@@ -53,14 +48,11 @@ def generate_launch_description():
         )
         .to_moveit_configs()
     )  
-    #pprint.pprint(moveit_config.planning_pipelines)
 
     x_arg = DeclareLaunchArgument('x', default_value='0', description='X position of the robot')
     y_arg = DeclareLaunchArgument('y', default_value='0', description='Y position of the robot')
     z_arg = DeclareLaunchArgument('z', default_value='0', description='Z position of the robot')
 
-    
-    # Include Gazebo Ignition con il world selezionato
     gazebo_ignition = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
@@ -73,6 +65,11 @@ def generate_launch_description():
         launch_arguments = {
             'gz_args': world_file
         }.items()
+
+    )
+
+    rviz_config_path = (
+        get_package_share_directory("ur5_new_moveit_config") + "/config/mtc.rviz"
     )
 
     rviz_node = Node(
@@ -154,10 +151,10 @@ def generate_launch_description():
         parameters=[
             config_dict,
             move_group_capabilities,
-            {"joint_state_topic": "/joint_states"},
             ],
         arguments=["--ros-args", "--log-level", "info"],
     )
+
 
     delay_arm_controller = RegisterEventHandler(
         OnProcessStart(
@@ -179,7 +176,7 @@ def generate_launch_description():
             on_start=[rviz_node],
         )
     )
-
+    
 
     # Launch Description
     ld.add_action(x_arg)
@@ -195,6 +192,5 @@ def generate_launch_description():
     ld.add_action(delay_arm_controller)
     ld.add_action(delay_hand_controller)
     ld.add_action(delay_rviz_node)
-
 
     return ld
