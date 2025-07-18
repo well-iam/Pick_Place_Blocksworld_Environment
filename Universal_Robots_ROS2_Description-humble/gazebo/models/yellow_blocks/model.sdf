@@ -1,0 +1,79 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="blocks">
+    <static>false</static>
+    <link name="link">
+      <!-- Inertial properties (optional but recommended) -->
+      <inertial>
+        <mass>0.5</mass>
+        <inertia>
+          <ixx>0.000333</ixx>
+          <iyy>0.000333</iyy>
+          <izz>0.000333</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.07 0.07 0.07</size>
+          </box>
+        </geometry>
+
+        <!-- HIGH FRICTION / ZERO BOUNCE -->
+        <surface>
+          <friction>
+            <ode>
+              <!-- High mu to resist sliding when placing -->
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+          <bounce>
+            <!-- No restitution so it won’t bounce -->
+            <restitution_coefficient>0.0</restitution_coefficient>
+            <threshold>100.0</threshold>
+          </bounce>
+          <!-- Optional: soft contact to damp vibration -->
+          <contact>
+            <ode>
+              <kp>1e5</kp>        <!-- contact stiffness -->
+              <kd>1e3</kd>        <!-- contact damping -->
+              <max_vel>0.1</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.07 0.07 0.07</size>
+          </box>
+        </geometry>
+        
+        <material>
+          <ambient>1 1 0 1</ambient>   <!-- Yellow -->
+          <diffuse>1 1 0 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+    </link>
+    <plugin
+    filename="libpose_relay_plugin.so"
+    name="my_sim_plugins::PoseRelayPlugin"/>
+
+<!--     <plugin
+      name="gz::sim::systems::Physics"
+      filename="ignition-gazebo-physics-system">
+      <engine>
+        <filename>dartsim</filename>
+      </engine>
+    </plugin> -->
+
+
+  </model>
+</sdf>

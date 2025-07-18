@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:arg name="initial_position" default="$(find ur_description)/config/initial_positions.yaml"/>
+
+
+  <xacro:include filename="$(find robotiq_description)/urdf/robotiq_2f_85_macro.urdf.xacro"/>
+  <xacro:robotiq_gripper name="RobotiqGripperHardwareInterface" prefix="" parent="flange">
+    <origin xyz = "0 0 0" rpy = "0 1.57 0"/>
+  </xacro:robotiq_gripper>
+
+</robot>

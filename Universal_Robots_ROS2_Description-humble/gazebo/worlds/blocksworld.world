@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <!-- We use a custom world for the rrbot so that the camera angle is launched correctly -->
+  
+
+  <world name="blocksworld">
+    
+
+    <!-- Physics settings to disable gravity -->
+    <!-- Set gravity to zero for Gazebo Ignition -->
+    <gravity>0 0 -9.81</gravity>
+
+
+      <!-- Included light -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun</uri>
+    </include>
+ 
+    <!-- Included model -->
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane</uri>
+    </include>
+
+
+    <include>
+      <uri> model://red_blocks</uri>
+      <!-- <uri> package://red_blocks</uri> -->
+      <name>block_a</name>
+      <pose>0.75 0.25 0.105 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri> model://green_blocks</uri>
+      <!-- <uri> package://green_blocks</uri> -->
+      <name>block_b</name>
+      <pose>0.75 -0.25 0.105  0 0 0</pose>
+    </include> 
+
+
+    <include>
+      <uri> model://blue_blocks</uri>
+      <!-- <uri> package://blue_blocks</uri> -->
+      <name>block_c</name>
+      <pose>0.75 0.25 0.035 0 0 0</pose>
+    </include>
+
+
+    <include>
+      <uri> model://black_blocks</uri>
+      <name>block_d</name>
+      <pose>0.75 -0.25 0.035 0 0 0</pose>
+    </include> 
+
+    <include>
+      <uri> model://white_blocks</uri>
+      <name>block_e</name>
+      <pose>0.75 0 0.105 0 0 0</pose>
+    </include> 
+
+
+    <include>
+      <uri> model://yellow_blocks</uri>
+      <!-- <uri> package://yellow_blocks</uri> -->
+      <name>block_f</name>
+      <pose>0.75 0 0.035 0 0 0</pose>
+    </include> 
+
+
+  </world>
+</sdf>
