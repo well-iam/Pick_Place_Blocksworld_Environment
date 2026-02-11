@@ -2,12 +2,26 @@
 
 ## :package: About
 
-This package contains the developed code for the final project of the Planning and Navigation 2024/25 Course. The authors of the package are:
-Chiara Panagrosso, Roberto Rocco, William Notaro. Here's an example video
+This project implements a comprehensive architecture for autonomous manipulation (Pick & Place) utilizing **ROS 2**, **MoveIt 2**, and **HTN Planning**. The system enables a **UR5e** manipulator to perceive a "Blocksworld" environment in **Gazebo**, generate a symbolic plan to reorder blocks, and physically execute it via the **MoveIt Task Constructor**. Developed as the final project for the *Planning and Navigation 2024/25 Course* by Chiara Panagrosso, Roberto Rocco, and William Notaro.
 
 https://private-user-images.githubusercontent.com/182740140/467962562-0d6c1e1e-ce1d-46a5-9862-abccb1980fe2.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTI4MzIxMDMsIm5iZiI6MTc1MjgzMTgwMywicGF0aCI6Ii8xODI3NDAxNDAvNDY3OTYyNTYyLTBkNmMxZTFlLWNlMWQtNDZhNS05ODYyLWFiY2NiMTk4MGZlMi5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNzE4JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDcxOFQwOTQzMjNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT04NDE2NmU0MWQxNDBkNTM3ZjdkMmMzNmU1ZGZiNjlkODA4YTJmZmFlZDQzYjFkZGM1ZDg0N2ExMWVjYmRhNjBiJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.PxCx_JmYlHH0dlaoo6u91ZOYYkAP6NSsMMZrTjmxWW8
 
-## :clipboard: Requirements
+## :page_with_curl: Key Features
+The system is built upon a modular pipeline that includes:
+
+- **Symbolic State Generation (Perception):** Utilizing a custom plugin (`PoseRelayPlugin`), the system extracts the geometric poses of blocks from Gazebo and converts them into symbolic predicates (e.g., `on(block_a, table)`, `clear(block_b)`) to represent the world state in real-time .
+
+- **HTN Planning (Hierarchical Task Network):** An HTN planner (based on the SHOP paradigm) receives the initial state and the goal. The planner decomposes complex tasks (e.g., `move_blocks`) into a sequence of primitive actions (`unstack`, `putdown`, `stack`, `pickup`) ready for execution .
+
+- **Execution with MoveIt Task Constructor (MTC):** The symbolic plan is dynamically translated into motion tasks. Each action pair (Pick & Place) is handled by MTC, which computes collision-free trajectories using sampling-based solvers (e.g., RRT) and manages the approach, grasp, release, and retreat stages .
+
+- **Scene Management & Replanning:** The system includes an automatic replanning mechanism. Before every action, it verifies the consistency between the planner's expected symbolic state and the actual real-world state. In case of execution failure or inconsistency (e.g., a block is moved unexpectedly), the system recalculates the plan to recover and complete the task .
+
+- **Multi-Configuration Support:** The project supports two operational modes:
+  - **Gripper-less:** A simplified simulation where grasping is achieved via frame attachment (gravity-free environment) .
+  - **With Gripper (Robotiq 2F-85):** A full physical simulation with active gravity and realistic contact dynamics.
+
+# :clipboard: Requirements
 This package **requires MoveIt2 to be pre-installed** on your system.
 
 :point_right: Follow the [official MoveIt2 installation guide](https://moveit.picknik.ai/humble/doc/tutorials/getting_started/getting_started.html) to set it up properly.
@@ -37,7 +51,7 @@ Docker installed on your system. You can get it from the [official Docker websit
 Superuser permissions are requested. If you want to avoid invoking sudo you can add the currently logged-in user to the docker group
 
 
-### \:hammer\_and\_wrench: Using the Prebuilt Docker Image
+## \:hammer\_and\_wrench: Using the Prebuilt Docker Image
 
 1. Clone the repository containing Dockerfile and scripts to build and tun the image into a local folder:
 
@@ -93,7 +107,7 @@ and select the container you want to connect to.
 
 # :rocket: Launching the Application
 
-## :white_check_mark: Usage
+### :white_check_mark: Usage
 1. Run the RVIZ environment and Gazebo simulation through the launch file:
 ```
 ros2 launch ur_description setup.launch.py 
@@ -110,7 +124,7 @@ ros2 run mtc_package manager
 ros2 launch blocksword_planner htn_launch.py 
 ``` 
 
-## :warning: Warning
+### :warning: Warning
 During the launch of the Gazebo environment you could face a list of errors similar to:
 ```diff
 - [GUI] [Err] [SystemPaths.cc:378] Unable to find file with URI [model://robotiq_description/meshes/visual/2f_85/robotiq_base.dae]
